@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +14,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp",
+              "RelativeDocumentMoniker": "main.cpp",
+              "ToolTip": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-11-20T02:23:51.985Z",
+              "EditorCaption": ""
             }
           ]
         }
