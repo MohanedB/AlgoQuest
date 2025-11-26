@@ -1,49 +1,33 @@
 #pragma once
-
 #include <string>
-#include <queue>
+#include <deque>
 #include <SFML/System/Vector2.hpp>
 
-enum class ActionType
-{
-    Move,       // déplacement
-    Attack,     // attaque
-    GetItem,    // ramasser un objet
-    UseItem,    // utiliser un objet
-    Interact,   // interaction
-    Wait        // attente
+// J'ai mis les types pour les boys, mais je code juste Move et Wait
+enum class ActionType { Move, Wait, Attack, Get, Use, Interact };
+
+struct Action {
+    ActionType type;
+    std::string description;    // Texte pour l'UI
+    sf::Vector2f targetPos;     // Sert juste pour le Move
+    float duration;             // Sert pour le Wait
+    // TODO: Ajouter int targetId pour l'attaque (voir avec coequipier)
 };
 
-struct Action
-{
-    ActionType   type{};                 // type d’action
-    std::string  description;            // texte explicatif
-
-    // Paramètres possibles selon le type
-    sf::Vector2f targetPosition{ 0.f, 0.f }; // pour Move / Interact
-    int          targetEnemyId{ -1 };        // pour Attack
-    std::string  itemId;                   // pour GetItem / UseItem
-    float        waitSeconds{ 0.f };         // pour Wait
-};
-
-class ActionQueue
-{
+class ActionQueue {
 public:
-    void enqueue(const Action& action);
-    bool isEmpty() const;
-    Action& front();
-    const Action& front() const;
+    void add(const Action& action);
     void pop();
-    std::size_t size() const;
+    bool isEmpty() const;
+    Action& current();
+
+    // J'ai besoin de ca pour afficher la liste dans le main
+    const std::deque<Action>& getAll() const;
 
 private:
-    std::queue<Action> m_actions;
+    std::deque<Action> m_queue; // deque c mieux que queue pour l'affichage
 };
 
-// Fabriques d’actions (helpers)
-Action MakeMoveAction(const sf::Vector2f& destination);
-Action MakeAttackAction(int enemyId);
-Action MakeGetItemAction(const std::string& itemId);
-Action MakeUseItemAction(const std::string& itemId);
-Action MakeInteractAction(const sf::Vector2f& position, const std::string& label);
-Action MakeWaitAction(float seconds);
+// Mes helpers a moi
+Action CreateMove(float x, float y);
+Action CreateWait(float sec);

@@ -1,97 +1,43 @@
 #include "Action.hpp"
-#include <string>
 
-// ==========================
-// ActionQueue
-// ==========================
-
-void ActionQueue::enqueue(const Action& action)
-{
-    m_actions.push(action);
+// Ajoute a la fin
+void ActionQueue::add(const Action& action) {
+    m_queue.push_back(action);
 }
 
-bool ActionQueue::isEmpty() const
-{
-    return m_actions.empty();
+// Vire le premier
+void ActionQueue::pop() {
+    if (!m_queue.empty()) m_queue.pop_front();
 }
 
-Action& ActionQueue::front()
-{
-    return m_actions.front();
+bool ActionQueue::isEmpty() const {
+    return m_queue.empty();
 }
 
-const Action& ActionQueue::front() const
-{
-    return m_actions.front();
+// Check c'est quoi l'action en cours
+Action& ActionQueue::current() {
+    return m_queue.front();
 }
 
-void ActionQueue::pop()
-{
-    if (!m_actions.empty())
-        m_actions.pop();
+// Getter pour l'interface graphique
+const std::deque<Action>& ActionQueue::getAll() const {
+    return m_queue;
 }
 
-std::size_t ActionQueue::size() const
-{
-    return m_actions.size();
-}
+// --- Mes fonctions ---
 
-// ==========================
-// Helpers pour créer des actions
-// ==========================
-
-Action MakeMoveAction(const sf::Vector2f& destination)
-{
+Action CreateMove(float x, float y) {
     Action a;
     a.type = ActionType::Move;
-    a.description = "Déplacement vers (" +
-        std::to_string(static_cast<int>(destination.x)) + ", " +
-        std::to_string(static_cast<int>(destination.y)) + ")";
-    a.targetPosition = destination;
+    a.targetPos = { x, y };
+    a.description = "WALK -> (" + std::to_string((int)x) + ", " + std::to_string((int)y) + ")";
     return a;
 }
 
-Action MakeAttackAction(int enemyId)
-{
-    Action a;
-    a.type = ActionType::Attack;
-    a.description = "Attaque ennemi #" + std::to_string(enemyId);
-    a.targetEnemyId = enemyId;
-    return a;
-}
-
-Action MakeGetItemAction(const std::string& itemId)
-{
-    Action a;
-    a.type = ActionType::GetItem;
-    a.description = "Ramasse l’objet: " + itemId;
-    a.itemId = itemId;
-    return a;
-}
-
-Action MakeUseItemAction(const std::string& itemId)
-{
-    Action a;
-    a.type = ActionType::UseItem;
-    a.description = "Utilise l’objet: " + itemId;
-    a.itemId = itemId;
-    return a;
-}
-
-Action MakeInteractAction(const sf::Vector2f& position, const std::string& label)
-{
-    Action a;
-    a.type = ActionType::Interact;
-    a.description = "Interaction avec: " + label;
-    a.targetPosition = position;
-    return a;
-}
-
-Action MakeWaitAction(float seconds)
-{
+Action CreateWait(float sec) {
     Action a;
     a.type = ActionType::Wait;
-    a.description = "Attente de " + std::to_string(seconds) + " secondes";
-    a.waitSeconds = seconds;
+    a.duration = sec;
+    a.description = "WAIT (" + std::to_string((int)sec) + "s)";
     return a;
 }
