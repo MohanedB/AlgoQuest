@@ -1,4 +1,4 @@
-### Visual Studio  C++ ###
+### Visual Studio / C++ ###
 
 # VS config
 .vs
@@ -7,67 +7,60 @@
 .userosscache
 .sln.docstates
 
-# Build results
+# Build results (J'ai commenté ceux qui bloquaient tes DLLs)
 [Bb]uild
-[Dd]ebug
+# [Dd]ebug
 [Dd]ebugPublic
 [Rr]elease
 [Rr]eleases
-x64
+# x64
 x86
 ARM
 [Aa][Rr][Mm]64
 ipch
 
-# Compiled object  debug files
-.obj
-.o
-.pch
-.pdb
-.idb
-.ilk
-.log
-.tlog
-.tmp
-.log
-.cache
-.pch
+# Compiled object & debug files (On ignore les fichiers inutiles, pas les dossiers)
+*.obj
+*.o
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.log
+*.tlog
+*.tmp
+*.cache
 
 # Auto-generated build files
-.aps
-.ncb
-.opendb
-.sdf
-.sln.ide
-.VC.db
-.VC.opendb
+*.aps
+*.ncb
+*.opendb
+*.sdf
+*.sln.ide
+*.VC.db
+*.VC.opendb
 
-# Static analysis  test
-.iobj
-.ipdb
-
-# CMake (if you end up using it)
+# CMake
 [Cc]MakeFiles
 CMakeCache.txt
 cmake_install.cmake
 Makefile
 CMakeFiles
 
-# Other IDEs
-.idea
-.iml
-
 # OS crap
 .DS_Store
 Thumbs.db
 
-### SFML  External libs ###
+# --- LA PARTIE IMPORTANTE ---
+# Force Git à prendre tes DLLs et ta police, peu importe où ils sont
+!*.dll
+!*.lib
+!*.ttf
+!*.png
+!*.wav
 
-# If you put SFML inside External, we keep headerslibs,
-# but ignore its build outputs if any.
-Externalbin
-Externallibcmake
-Externalexamples
-Externaldoc
-
-# (comment these lines out if teacher wants a super-minimal zip)
+### SFML External libs ###
+External/bin
+External/lib/cmake
+External/examples
+External/doc

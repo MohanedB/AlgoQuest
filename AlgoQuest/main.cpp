@@ -126,14 +126,13 @@ int main() {
                 }
             }
             else if (currentAction.type == ActionType::Wait) {
-                // Timer simple
                 currentAction.duration -= dt;
                 if (currentAction.duration <= 0) isBusy = false;
             }
             // TODO: Ajouter les else if pour Attack/Use ici
         }
 
-        // 4. RENDU UI
+        // 4.  UI
         inputText.setString("> " + userBuffer);
 
         std::string qStr = "--- QUEUE ---\n";
