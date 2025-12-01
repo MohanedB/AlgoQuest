@@ -7,6 +7,7 @@ enum class ItemType { Health, Damage, Buff };
 struct Item {
     ItemType type;
     int itemId;
+    float itemPower;
     std::string itemDesc;
 };
 

@@ -6,6 +6,7 @@
 #include <random>
 #include "Action.h"
 #include "Inventory.h"
+#include "Character.h"
 
 // Je parse juste mes commandes, les autres feront les leurs
 bool ParseCommand(const std::string& line, Action& outAction) {
@@ -47,24 +48,57 @@ int main() {
     player.setFillColor(sf::Color::Cyan);
     float speed = 200.f;
 
-    //SETUP ITEM AND IVENTORY
+    Character playerChar;
+	playerChar.HP = playerChar.MaxHealth;
+	playerChar.damage = 5.0f;
+
+    //SETUP ITEMS AND IVENTORY
     CharInventory inv;
     Item potion;
 	potion.type = ItemType::Health;
-    potion.itemId = 1;
+    potion.itemId = 583;
     potion.itemDesc = "Health Potion";
-    sf::RectangleShape potionRef(sf::Vector2f(30.0f, 30.0f));
+    potion.itemPower = 10.0f;
+
+    sf::CircleShape potionRef(20.0f);
 	potionRef.setFillColor(sf::Color::Green);
 	potionRef.setOrigin({ 15.f, 15.f });
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    std::random_device rdH;
+    std::mt19937 gen(rdH());
     std::uniform_real_distribution<float> dist(0.0f, 500.0f);
+    float RandomXH = dist(gen);
+    float RandomYH = dist(gen);
+    potionRef.setPosition({ RandomXH , RandomYH });
 
-    float RandomX = dist(gen);
-    float RandomY = dist(gen);
+    Item fireball;
+    fireball.type = ItemType::Damage;
+    fireball.itemId = 194;
+    fireball.itemDesc = "Fireball Spell";
+    fireball.itemPower = 15.0f;
 
-	potionRef.setPosition({ RandomX , RandomY });
+    sf::CircleShape fireballRef(20.0f);
+    fireballRef.setFillColor(sf::Color::Yellow);
+    fireballRef.setOrigin({ 15.f, 15.f });
+    std::random_device rdD;
+    std::mt19937 genD(rdD());
+    float RandomXD = dist(genD);
+    float RandomYD = dist(genD);
+	fireballRef.setPosition({ RandomXD , RandomYD });
+
+    Item damageBuff;
+    damageBuff.type = ItemType::Buff;
+    damageBuff.itemId = 277;
+    damageBuff.itemDesc = "Damage Buff";
+    damageBuff.itemPower = 5.0f;
+
+    sf::CircleShape damageBuffRef(20.0f);
+    damageBuffRef.setFillColor(sf::Color::Red);
+    damageBuffRef.setOrigin({ 15.f, 15.f });
+    std::random_device rdB;
+    std::mt19937 genB(rdB());
+    float RandomXB = dist(gen);
+    float RandomYB = dist(gen);
+    damageBuffRef.setPosition({ RandomXB , RandomYB });
 
     sf::Font font;
     if (!font.openFromFile("arial.ttf")) return -1;
@@ -87,10 +121,21 @@ int main() {
     queueDisplay.setFillColor(sf::Color::Yellow);
 
     // Inventaire
-	sf::Text inventoryShow(font, "inventaire", 25);
+    std::string inventoryText = "Inventaire: \n";
+	sf::Text inventoryShow(font, "", 25);
     inventoryShow.setPosition({ 15.f, 15.f });
     inventoryShow.setFillColor(sf::Color(150, 150, 150));
-    inventoryShow.setString("Inventaire: ");
+    inventoryShow.setString(inventoryText);
+    int idx = 1;
+
+    //REMOVE AFTER GET IS DONE
+    inv.add(potion);
+	inv.add(fireball);
+	inv.add(damageBuff);
+
+    for (const auto& a : inv.getAllItems()) {
+        inventoryText += std::to_string(idx++) + ". " + " itemID: " + std::to_string(a.itemId) + " Name: " + a.itemDesc + "\n";
+    }
 
     // Logique
     ActionQueue myQueue;
@@ -158,11 +203,19 @@ int main() {
             }
             else if (currentAction.type == ActionType::Get)
             {
+                //TODO: Check for collision with an item
+                //inv.add(itemHit);
+                //Destroy item ref
 
+                //Destroy temporaire, si une meilleure manière est trouvée, ceci va être supprimé
+                potionRef.setPosition({9999.0f, 9999.0f});
             }
             else if (currentAction.type == ActionType::Use) 
             {
-
+                //TODO: Ajouter switch case qui check si item utilisé est heal, damage ou buff
+				playerChar.heal(potion.itemPower);
+                //Use Damage Item
+                //Use Damage Buff
             }
             // TODO: Ajouter les else if pour Attack ici
         }
@@ -178,10 +231,13 @@ int main() {
         if (isBusy) qStr += "\n[RUNNING]...\n";
 
         queueDisplay.setString(qStr);
+		inventoryShow.setString(inventoryText);
 
         window.clear(sf::Color::Black);
         window.draw(player);
 		window.draw(potionRef);
+        window.draw(fireballRef);
+        window.draw(damageBuffRef);
         window.draw(inputText);
         window.draw(helpText);
         window.draw(queueDisplay);
