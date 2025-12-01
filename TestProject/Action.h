@@ -2,6 +2,7 @@
 #include <string>
 #include <deque>
 #include <SFML/System/Vector2.hpp>
+#include "Inventory.h"
 
 // J'ai mis les types pour les boys, mais je code juste Move et Wait
 enum class ActionType { Move, Wait, Attack, Get, Use, Interact };
@@ -31,3 +32,7 @@ private:
 // Mes helpers a moi
 Action CreateMove(float x, float y);
 Action CreateWait(float sec);
+
+//Actions pour Items
+Action CreateGet(const Item& item);
+Action CreateUse(int itemId);

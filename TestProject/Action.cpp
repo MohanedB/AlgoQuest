@@ -41,3 +41,18 @@ Action CreateWait(float sec) {
     a.description = "WAIT (" + std::to_string((int)sec) + "s)";
     return a;
 }
+
+//Actions pour Items
+Action CreateGet(int itemId) {
+    Action a;
+    a.type = ActionType::Get;
+    a.description = "GOT ITEM -> ( Id: " + std::to_string((int)itemId) + ")";
+	return a;
+}
+
+Action CreateUse(int itemId) {
+	Action a;
+	a.type = ActionType::Use;
+    a.description = "USED ITEM -> ( Id: " + std::to_string((int)itemId) + ")";
+	return a;
+}

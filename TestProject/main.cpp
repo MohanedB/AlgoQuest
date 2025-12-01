@@ -3,7 +3,9 @@
 #include <sstream>
 #include <cmath>
 #include <optional>
+#include <random>
 #include "Action.h"
+#include "Inventory.h"
 
 // Je parse juste mes commandes, les autres feront les leurs
 bool ParseCommand(const std::string& line, Action& outAction) {
@@ -45,6 +47,25 @@ int main() {
     player.setFillColor(sf::Color::Cyan);
     float speed = 200.f;
 
+    //SETUP ITEM AND IVENTORY
+    CharInventory inv;
+    Item potion;
+	potion.type = ItemType::Health;
+    potion.itemId = 1;
+    potion.itemDesc = "Health Potion";
+    sf::RectangleShape potionRef(sf::Vector2f(30.0f, 30.0f));
+	potionRef.setFillColor(sf::Color::Green);
+	potionRef.setOrigin({ 15.f, 15.f });
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.0f, 500.0f);
+
+    float RandomX = dist(gen);
+    float RandomY = dist(gen);
+
+	potionRef.setPosition({ RandomX , RandomY });
+
     sf::Font font;
     if (!font.openFromFile("arial.ttf")) return -1;
 
@@ -58,12 +79,18 @@ int main() {
     sf::Text helpText(font, "", 16);
     helpText.setPosition({ 10.f, 480.f });
     helpText.setFillColor(sf::Color(150, 150, 150));
-    helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]");
+    helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]");
 
     // File d'attente (HUD)
     sf::Text queueDisplay(font, "FILE:", 18);
     queueDisplay.setPosition({ 550.f, 20.f });
     queueDisplay.setFillColor(sf::Color::Yellow);
+
+    // Inventaire
+	sf::Text inventoryShow(font, "inventaire", 25);
+    inventoryShow.setPosition({ 15.f, 15.f });
+    inventoryShow.setFillColor(sf::Color(150, 150, 150));
+    inventoryShow.setString("Inventaire: ");
 
     // Logique
     ActionQueue myQueue;
@@ -129,7 +156,15 @@ int main() {
                 currentAction.duration -= dt;
                 if (currentAction.duration <= 0) isBusy = false;
             }
-            // TODO: Ajouter les else if pour Attack/Use ici
+            else if (currentAction.type == ActionType::Get)
+            {
+
+            }
+            else if (currentAction.type == ActionType::Use) 
+            {
+
+            }
+            // TODO: Ajouter les else if pour Attack ici
         }
 
         // 4.  UI
@@ -146,9 +181,11 @@ int main() {
 
         window.clear(sf::Color::Black);
         window.draw(player);
+		window.draw(potionRef);
         window.draw(inputText);
         window.draw(helpText);
         window.draw(queueDisplay);
+		window.draw(inventoryShow);
         window.display();
     }
     return 0;

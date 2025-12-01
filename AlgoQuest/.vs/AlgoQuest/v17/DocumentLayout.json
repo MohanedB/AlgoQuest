@@ -1,17 +1,17 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\",
+  "WorkspaceRootPath": "C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|solutionrelative:Action.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{14141DC9-65A6-401B-A935-750DBE858A7C}|AlgoQuest.vcxproj|solutionrelative:Action.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -22,43 +22,45 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "Action.cpp",
-              "DocumentMoniker": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.cpp",
+              "DocumentMoniker": "C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.cpp",
               "RelativeDocumentMoniker": "Action.cpp",
-              "ToolTip": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.cpp",
+              "ToolTip": "C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.cpp",
               "RelativeToolTip": "Action.cpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-11-20T04:05:22.268Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-20T04:05:22.268Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
               "Title": "Action.hpp",
-              "DocumentMoniker": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.hpp",
+              "DocumentMoniker": "C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.hpp",
               "RelativeDocumentMoniker": "Action.hpp",
-              "ToolTip": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.hpp",
+              "ToolTip": "C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\Action.hpp",
               "RelativeToolTip": "Action.hpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-11-20T04:04:32.85Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-20T04:04:32.85Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp",
+              "DocumentMoniker": "C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp",
               "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "C:\\Users\\mohan\\OneDrive - UQAT\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp",
+              "ToolTip": "C:\\Users\\fredv\\OneDrive\\Documents\\GitHub\\AlgoQuest\\AlgoQuest\\main.cpp",
               "RelativeToolTip": "main.cpp",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAqwJoAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-11-20T02:23:51.985Z",
               "EditorCaption": ""
