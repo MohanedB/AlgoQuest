@@ -36,3 +36,6 @@ Action CreateWait(float sec);
 //Actions pour Items
 Action CreateGet(const Item& item);
 Action CreateUse(int itemId);
+
+
+Action CreateAttack();

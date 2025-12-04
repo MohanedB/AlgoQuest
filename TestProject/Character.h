@@ -5,7 +5,7 @@ class Character {
 public:
 	float MaxHealth = 100.0f;
 	float HP;
-	float damage;
+	float damage = 5.0f;
 
 	void takeDamage(float damageTaken);
 

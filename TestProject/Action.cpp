@@ -56,3 +56,10 @@ Action CreateUse(int itemId) {
     a.description = "USED ITEM -> ( Id: " + std::to_string((int)itemId) + ")";
 	return a;
 }
+
+Action CreateAttack() {
+    Action a;
+    a.type = ActionType::Attack;
+    a.description = "STARTING COMBAT...";
+    return a;
+}
