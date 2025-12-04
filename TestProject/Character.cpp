@@ -2,12 +2,17 @@
 
 void Character::takeDamage(float damageTaken)
 {
-		HP -= damageTaken;
-		if (HP <= 0) HP = 0;
+	HP -= damageTaken;
+	if (HP <= 0) HP = 0;
 }
 
 void Character::heal(float healAmount)
 {
 	HP += healAmount;
 	if (HP >= MaxHealth) HP = MaxHealth;
+}
+
+void Character::Attack(Character& target)
+{
+	target.takeDamage(damage);
 }

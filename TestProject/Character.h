@@ -10,4 +10,6 @@ public:
 	void takeDamage(float damageTaken);
 
 	void heal(float healAmount);
+
+	void Attack(Character& target);
 };

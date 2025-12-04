@@ -50,7 +50,58 @@ int main() {
 
     Character playerChar;
 	playerChar.HP = playerChar.MaxHealth;
-	playerChar.damage = 5.0f;
+	playerChar.damage = 10.0f;
+
+
+
+    // Spawn Ennemies
+    
+    // Ennemy 1
+	sf::RectangleShape enemy1(sf::Vector2f(30.f, 30.f));
+	enemy1.setOrigin({ 15.f, 15.f });
+    std::random_device rdE1;
+    std::mt19937 genE1(rdE1());
+    std::uniform_real_distribution<float> distE1(0.0f, 500.0f);
+    float RandomXE1 = distE1(genE1);
+    float RandomYE1 = distE1(genE1);
+    enemy1.setPosition({ RandomXE1, RandomYE1 });
+	enemy1.setFillColor(sf::Color::Red);
+    Character enemyChar1;
+    enemyChar1.MaxHealth = 25.0f;
+    enemyChar1.HP = enemyChar1.MaxHealth;
+    enemyChar1.damage = 5.0f;
+
+    // Ennemy 2
+    sf::RectangleShape enemy2(sf::Vector2f(30.f, 30.f));
+    enemy2.setOrigin({ 15.f, 15.f });
+    std::random_device rdE2;
+    std::mt19937 genE2(rdE2());
+    std::uniform_real_distribution<float> distE2(0.0f, 500.0f);
+    float RandomXE2 = distE1(genE2);
+    float RandomYE2 = distE1(genE2);
+    enemy2.setPosition({ RandomXE2, RandomYE2 });
+    enemy2.setFillColor(sf::Color::Red);
+    Character enemyChar2;
+    enemyChar2.MaxHealth = 35.0f;
+    enemyChar2.HP = enemyChar1.MaxHealth;
+    enemyChar2.damage = 5.0f;
+
+    // Ennemy 3
+    sf::RectangleShape enemy3(sf::Vector2f(50.f, 50.f));
+    enemy3.setOrigin({ 25.f, 25.f });
+    std::random_device rdE3;
+    std::mt19937 genE3(rdE3());
+    std::uniform_real_distribution<float> distE3(0.0f, 500.0f);
+    float RandomXE3 = distE3(genE3);
+    float RandomYE3 = distE3(genE3);
+    enemy3.setPosition({ RandomXE3, RandomYE3 });
+    enemy3.setFillColor(sf::Color::Red);
+    Character enemyChar3;
+    enemyChar3.MaxHealth = 50.0f;
+    enemyChar3.HP = enemyChar1.MaxHealth;
+    enemyChar3.damage = 7.0f;
+
+
 
     //SETUP ITEMS AND IVENTORY
     CharInventory inv;
@@ -77,7 +128,7 @@ int main() {
     fireball.itemPower = 15.0f;
 
     sf::CircleShape fireballRef(20.0f);
-    fireballRef.setFillColor(sf::Color::Yellow);
+    fireballRef.setFillColor(sf::Color(255, 128, 0, 255));
     fireballRef.setOrigin({ 15.f, 15.f });
     std::random_device rdD;
     std::mt19937 genD(rdD());
@@ -92,7 +143,7 @@ int main() {
     damageBuff.itemPower = 5.0f;
 
     sf::CircleShape damageBuffRef(20.0f);
-    damageBuffRef.setFillColor(sf::Color::Red);
+    damageBuffRef.setFillColor(sf::Color::Yellow);
     damageBuffRef.setOrigin({ 15.f, 15.f });
     std::random_device rdB;
     std::mt19937 genB(rdB());
@@ -115,6 +166,14 @@ int main() {
     helpText.setFillColor(sf::Color(150, 150, 150));
     helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]");
 
+    // PlayerHealth
+	sf::Text playerHealthDisplay(font, "", 16);
+	playerHealthDisplay.setPosition({ 10.f, 100.f });
+	playerHealthDisplay.setFillColor(sf::Color(0, 255, 0));
+    std::ostringstream ssHP;
+    ssHP << std::fixed << std::setprecision(0) << playerChar.HP; // float to int
+    playerHealthDisplay.setString("HP: " + ssHP.str());
+
     // File d'attente (HUD)
     sf::Text queueDisplay(font, "FILE:", 18);
     queueDisplay.setPosition({ 550.f, 20.f });
@@ -122,7 +181,7 @@ int main() {
 
     // Inventaire
     std::string inventoryText = "Inventaire: \n";
-	sf::Text inventoryShow(font, "", 25);
+	sf::Text inventoryShow(font, "", 16);
     inventoryShow.setPosition({ 15.f, 15.f });
     inventoryShow.setFillColor(sf::Color(150, 150, 150));
     inventoryShow.setString(inventoryText);
@@ -235,11 +294,15 @@ int main() {
 
         window.clear(sf::Color::Black);
         window.draw(player);
+		window.draw(enemy1);
+        window.draw(enemy2);
+		window.draw(enemy3);
 		window.draw(potionRef);
         window.draw(fireballRef);
         window.draw(damageBuffRef);
         window.draw(inputText);
         window.draw(helpText);
+		window.draw(playerHealthDisplay);
         window.draw(queueDisplay);
 		window.draw(inventoryShow);
         window.display();
