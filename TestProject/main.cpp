@@ -47,70 +47,55 @@ int main() {
 	window.setFramerateLimit(60);
 
 	// 1. SETUP PLAYER
-	sf::RectangleShape player(sf::Vector2f(30.f, 30.f));
-	player.setOrigin({ 15.f, 15.f });
-	player.setPosition({ 100.f, 300.f });
-	player.setFillColor(sf::Color::Cyan);
+	Character player;
+	player.Initialize(30.f, 100.f, 300.f, sf::Color::Cyan, 100.0f, 10.0f);
 	float speed = 200.f;
 
-	Character playerChar;
-	playerChar.HP = playerChar.MaxHealth;
-	playerChar.damage = 10.0f;
-
-
-
-	// Spawn Ennemies
+	// 2. SPAWN ENEMIES
 
 	// Ennemy 1
-	sf::RectangleShape enemy1(sf::Vector2f(30.f, 30.f));
-	enemy1.setOrigin({ 15.f, 15.f });
 	std::random_device rdE1;
 	std::mt19937 genE1(rdE1());
-	std::uniform_real_distribution<float> distE1(0.0f, 500.0f);
+	std::uniform_real_distribution<float> distE1(100.0f, 500.0f);
 	float RandomXE1 = distE1(genE1);
 	float RandomYE1 = distE1(genE1);
-	enemy1.setPosition({ RandomXE1, RandomYE1 });
-	enemy1.setFillColor(sf::Color::Red);
-	Character enemyChar1;
-	enemyChar1.MaxHealth = 25.0f;
-	enemyChar1.HP = enemyChar1.MaxHealth;
-	enemyChar1.damage = 5.0f;
+	Character enemy1;
+	enemy1.Initialize(30.f, RandomXE1, RandomYE1, sf::Color::Red, 25.0f, 5.0f);
 
 	// Ennemy 2
-	sf::RectangleShape enemy2(sf::Vector2f(30.f, 30.f));
-	enemy2.setOrigin({ 15.f, 15.f });
 	std::random_device rdE2;
 	std::mt19937 genE2(rdE2());
-	std::uniform_real_distribution<float> distE2(0.0f, 500.0f);
+	std::uniform_real_distribution<float> distE2(100.0f, 500.0f);
 	float RandomXE2 = distE2(genE2);
 	float RandomYE2 = distE2(genE2);
-	enemy2.setPosition({ RandomXE2, RandomYE2 });
-	enemy2.setFillColor(sf::Color::Red);
-	Character enemyChar2;
-	enemyChar2.MaxHealth = 35.0f;
-	enemyChar2.HP = enemyChar2.MaxHealth;
-	enemyChar2.damage = 7.0f;
-
+	Character enemy2;
+	enemy2.Initialize(30.f, RandomXE2, RandomYE2, sf::Color::Red, 35.0f, 7.0f);
+	
 	// Ennemy 3
-	sf::RectangleShape enemy3(sf::Vector2f(50.f, 50.f));
-	enemy3.setOrigin({ 25.f, 25.f });
 	std::random_device rdE3;
 	std::mt19937 genE3(rdE3());
-	std::uniform_real_distribution<float> distE3(0.0f, 500.0f);
+	std::uniform_real_distribution<float> distE3(100.0f, 500.0f);
 	float RandomXE3 = distE3(genE3);
 	float RandomYE3 = distE3(genE3);
-	enemy3.setPosition({ RandomXE3, RandomYE3 });
-	enemy3.setFillColor(sf::Color::Red);
-	Character enemyChar3;
-	enemyChar3.MaxHealth = 50.0f;
-	enemyChar3.HP = enemyChar3.MaxHealth;
-	enemyChar3.damage = 15.0f;
+	Character enemy3;
+	enemy3.Initialize(50.f, RandomXE3, RandomYE3, sf::Color::Red, 50.0f, 15.0f);
+	
 
-	sf::Vector2f enemiesPos[3] = { enemy1.getPosition(), enemy2.getPosition(), enemy3.getPosition() };
-	Character* enemiesChar[3] = { &enemyChar1, &enemyChar2, &enemyChar3 };
+	int numberOfEnemies = 3;
+	Character* enemies[3] = { &enemy1, &enemy2, &enemy3 };
 
+	// 3. SPAWN NPC
+	Character npc;
+	std::random_device rdNPC;
+	std::mt19937 genNPC(rdNPC());
+	std::uniform_real_distribution<float> distNPC(100.0f, 500.0f);
+	float RandomXNPC = distNPC(genNPC);
+	float RandomYNPC = distNPC(genNPC);
+	npc.Initialize(30.f, RandomXNPC, RandomYNPC, sf::Color::Blue, 999.0f, 0.0f);
 
-	//SETUP ITEMS AND IVENTORY
+	Character* talkables[4] = { &npc, &enemy1, &enemy2, &enemy3 };
+
+	// 4. SETUP ITEMS AND IVENTORY
 	CharInventory inv;
 	Item potion;
 	potion.type = ItemType::Health;
@@ -161,7 +146,7 @@ int main() {
 	sf::Font font;
 	if (!font.openFromFile("arial.ttf")) return -1;
 
-	// --- INTERFACE ---
+	// 5. SETUP INTERFACE
 
 	// Zone de texte
 	sf::Text inputText(font, "> ", 20);
@@ -169,15 +154,21 @@ int main() {
 
 	// Cheat sheet
 	sf::Text helpText(font, "", 16);
-	helpText.setPosition({ 10.f, 480.f });
+	helpText.setPosition({ 10.f, 450.f });
 	helpText.setFillColor(sf::Color(150, 150, 150));
-	helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]");
+	helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]\n - attack (if near enemy)\n - talk (if near npc/enemy)");
 
 	// Player and Enemies Health Display
-	playerChar.InitializeHealthDisplay(font, 16, 10.f, 100.f, sf::Color(0, 255, 0));
-	enemyChar1.InitializeHealthDisplay(font, 16, enemy1.getPosition().x - 25.f, enemy1.getPosition().y - 35.f, sf::Color(255, 0, 0));
-	enemyChar2.InitializeHealthDisplay(font, 16, enemy2.getPosition().x - 25.f, enemy2.getPosition().y - 35.f, sf::Color(255, 0, 0));
-	enemyChar3.InitializeHealthDisplay(font, 16, enemy3.getPosition().x - 25.f, enemy3.getPosition().y - 45.f, sf::Color(255, 0, 0));
+	player.InitializeHealthDisplay(font, 16, 10.f, 100.f, sf::Color(0, 255, 0));
+	enemy1.InitializeHealthDisplay(font, 16, enemy1.GetPosition().x - 25.f, enemy1.GetPosition().y + 15.f, sf::Color(255, 0, 0));
+	enemy2.InitializeHealthDisplay(font, 16, enemy2.GetPosition().x - 25.f, enemy2.GetPosition().y + 15.f, sf::Color(255, 0, 0));
+	enemy3.InitializeHealthDisplay(font, 16, enemy3.GetPosition().x - 25.f, enemy3.GetPosition().y + 25.f, sf::Color(255, 0, 0));
+
+	//NPC and Enemies Dialogue Display
+	enemy1.InitializeDialogueDisplay("I'm gonna beat you up", font, 16, enemy1.GetPosition().x - 70.f, enemy1.GetPosition().y - 35.f, sf::Color(255, 255, 255));
+	enemy2.InitializeDialogueDisplay("Fight me coward!", font, 16, enemy2.GetPosition().x - 55.f, enemy2.GetPosition().y - 35.f, sf::Color(255, 255, 255));
+	enemy3.InitializeDialogueDisplay("You don't stand a chance punk", font, 16, enemy3.GetPosition().x - 90.f, enemy3.GetPosition().y - 45.f, sf::Color(255, 255, 255));
+	npc.InitializeDialogueDisplay("Hello traveler!", font, 16, npc.GetPosition().x - 50.f, npc.GetPosition().y - 35.f, sf::Color(255, 255, 255));
 
 	// File d'attente (HUD)
 	sf::Text queueDisplay(font, "FILE:", 18);
@@ -192,7 +183,7 @@ int main() {
 	inventoryShow.setString(inventoryText);
 	int idx = 1;
 
-	//REMOVE AFTER GET IS DONE
+	//TODO REMOVE AFTER GET IS DONE
 	inv.add(potion);
 	inv.add(fireball);
 	inv.add(damageBuff);
@@ -201,17 +192,17 @@ int main() {
 		inventoryText += std::to_string(idx++) + ". " + " itemID: " + std::to_string(a.itemId) + " Name: " + a.itemDesc + "\n";
 	}
 
-	// Logique
+	// 6. MAIN LOOP
 	ActionQueue myQueue;
 	Action currentAction;
-	bool isBusy = false; // State: est-ce qu'on bouge ou pas
+	bool isBusy = false; // State: est-ce qu'on fait une action ou pas
 	std::string userBuffer;
 	sf::Clock clock;
 
 	while (window.isOpen()) {
 		float deltaTime = clock.restart().asSeconds();
 
-		// 2. INPUTS
+		// 6.1 - INPUTS
 		while (const std::optional<sf::Event> event = window.pollEvent()) {
 			if (event->is<sf::Event::Closed>()) window.close();
 
@@ -237,7 +228,7 @@ int main() {
 			}
 		}
 
-		// 3. MOTEUR (UPDATE)
+		// 6.2 - MOTEUR (UPDATE)
 
 		// Si libre, on pop la prochaine action
 		if (!isBusy && !myQueue.isEmpty()) {
@@ -246,25 +237,30 @@ int main() {
 			isBusy = true;
 		}
 
-		// Execution
+		// Action Executions
 		if (isBusy) {
+			// Move action
 			if (currentAction.type == ActionType::Move) {
 				// Logique de deplacement vectoriel
-				sf::Vector2f dir = currentAction.targetPos - player.getPosition();
+				sf::Vector2f dir = currentAction.targetPos - player.GetPosition();
 				float dist = getLength(dir);
 
 				if (dist < 5.f) {
-					player.setPosition(currentAction.targetPos); // Arrive
+					player.GetShape().setPosition(currentAction.targetPos); // Arrive
 					isBusy = false;
 				}
 				else {
-					player.move((dir / dist) * speed * deltaTime);
+					player.GetShape().move((dir / dist) * speed * deltaTime);
 				}
 			}
+
+			// Wait action
 			else if (currentAction.type == ActionType::Wait) {
 				currentAction.duration -= deltaTime;
 				if (currentAction.duration <= 0) isBusy = false;
 			}
+
+			//Get action
 			else if (currentAction.type == ActionType::Get)
 			{
 				//TODO: Check for collision with an item
@@ -274,10 +270,12 @@ int main() {
 				//Destroy temporaire, si une meilleure manière est trouvée, ceci va être supprimé
 				potionRef.setPosition({ 9999.0f, 9999.0f });
 			}
+
+			//Use action
 			else if (currentAction.type == ActionType::Use)
 			{
 				//TODO: Ajouter switch case qui check si item utilisé est heal, damage ou buff
-				playerChar.heal(potion.itemPower);
+				player.heal(potion.itemPower);
 				//Use Damage Item
 				//Use Damage Buff
 			}
@@ -289,13 +287,16 @@ int main() {
 				static bool inCombat = false;
 				if (!inCombat)
 				{
-					// choose nearest enemy in range
-					for (size_t i = 0; i < enemiesPos->length(); i++)
+					// choose first enemy in range
+					for (size_t i = 0; i < numberOfEnemies; i++)
 					{
-						float distToEnnemy = sf::Vector2f(player.getPosition() - enemiesPos[i]).length();
-						if (distToEnnemy <= 50.0f)
+						if (enemies[i]->IsDead() || enemies[i] == nullptr)
+							continue;
+
+						float distToEnemy = sf::Vector2f(player.GetPosition() - enemies[i]->GetPosition()).length();
+						if (distToEnemy <= 50.0f)
 						{
-							targetEnemy = enemiesChar[i];
+							targetEnemy = enemies[i];
 							inCombat = true;
 							std::cout << "Combat Starts!\n";
 							break;
@@ -308,8 +309,6 @@ int main() {
 					std::cout << "No enemy in range to attack.\n";
 					inCombat = false;
 					isBusy = false;
-
-					// TODO no enemy near text
 				}
 
 				if (inCombat)
@@ -321,37 +320,35 @@ int main() {
 					case 0:
 						// wait 1sec
 						attackCooldown -= deltaTime;
-						if (attackCooldown < 0)
+						if (attackCooldown <= 0)
 						{
 							attackCooldown = 1.0f;
 							currentAttacker = 1;
 
 							// attack
-							playerChar.Attack(*targetEnemy);
+							player.Attack(*targetEnemy);
 							targetEnemy->UpdateHealthDisplay();
 							std::cout << "Attacking enemy! (Enemy HP remaining: " << targetEnemy->HP << ")\n";
 
 							// check if dead
-							if (targetEnemy->HP <= 0)
+							if (targetEnemy->IsDead())
 							{
 								inCombat = false;
-								// TODO victory text
 								std::cout << "Enemy Defeated!!!";
-								currentAttacker = 0; // reset for next combat
-
-								// TODO delete enemy
-
-
-
+								// reset for next combat
+								currentAttacker = 0;
+								targetEnemy = nullptr;
 
 								// TODO Fred : spawn item
 
-
-
-
-
-
-
+								/**
+								*****************
+								*****************
+								*****************
+								*****************
+								*****************
+								*****************
+								**/
 
 								isBusy = false;
 								break;
@@ -361,26 +358,28 @@ int main() {
 					case 1:
 						// wait 1sec
 						attackCooldown -= deltaTime;
-						if (attackCooldown < 0)
+						if (attackCooldown <= 0)
 						{
 							attackCooldown = 1.0f;
 							currentAttacker = 0;
 
 							// Get attacked
-							targetEnemy->Attack(playerChar);
-							
+							targetEnemy->Attack(player);
+
 							// Update HP HUD
-							playerChar.UpdateHealthDisplay();
-							std::cout << "Enemy is attacking! (Player HP remaining: " << playerChar.HP << ")\n";
+							player.UpdateHealthDisplay();
+							std::cout << "Enemy is attacking! (Player HP remaining: " << player.HP << ")\n";
 
 							// check if dead
-							if (playerChar.HP <= 0)
+							if (player.IsDead())
 							{
 								inCombat = false;
-								// TODO GAME OVER
 								std::cout << "GAME OVER";
+								// reset for next combat
+								currentAttacker = 0;
+								targetEnemy = nullptr;
 
-
+								// TODO GAME OVER
 
 								isBusy = false;
 								break;
@@ -392,9 +391,15 @@ int main() {
 					}
 				}
 			}
+
+			//Talk action
+			else if (currentAction.type == ActionType::Talk)
+			{
+
+			}
 		}
 
-		// 4.  UI
+		// 6.3 - UI DRAWING
 		inputText.setString("> " + userBuffer);
 
 		std::string qStr = "--- QUEUE ---\n";
@@ -408,19 +413,38 @@ int main() {
 		inventoryShow.setString(inventoryText);
 
 		window.clear(sf::Color::Black);
-		window.draw(player);
-		window.draw(enemy1);
-		window.draw(enemy2);
-		window.draw(enemy3);
 		window.draw(potionRef);
 		window.draw(fireballRef);
 		window.draw(damageBuffRef);
+
+		window.draw(npc.GetShape());
+		if (!enemy1.IsDead())
+		{
+			window.draw(enemy1.GetShape());
+			window.draw(enemy1.healthDisplayText);
+		}
+		if (!enemy2.IsDead())
+		{
+			window.draw(enemy2.GetShape());
+			window.draw(enemy2.healthDisplayText);
+		}
+		if (!enemy3.IsDead())
+		{
+			window.draw(enemy3.GetShape());
+			window.draw(enemy3.healthDisplayText);
+		}
+		if (!player.IsDead())
+		{
+			window.draw(player.GetShape());
+			window.draw(player.healthDisplayText);
+		}
+		window.draw(npc.dialogueDisplayText);
+		window.draw(enemy1.dialogueDisplayText);
+		window.draw(enemy2.dialogueDisplayText);
+		window.draw(enemy3.dialogueDisplayText);
+
 		window.draw(inputText);
 		window.draw(helpText);
-		window.draw(playerChar.playerHealthDisplay);
-		window.draw(enemyChar1.playerHealthDisplay);
-		window.draw(enemyChar2.playerHealthDisplay);
-		window.draw(enemyChar3.playerHealthDisplay);
 		window.draw(queueDisplay);
 		window.draw(inventoryShow);
 		window.display();
