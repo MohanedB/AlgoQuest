@@ -25,6 +25,8 @@ public:
     float damage = 5.0f;
 	bool& IsDead() { return isDead; }
 
+	bool isTalking = false;
+
     void takeDamage(float damageTaken);
     void heal(float healAmount);
 

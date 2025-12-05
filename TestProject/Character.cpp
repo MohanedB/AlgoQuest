@@ -67,6 +67,6 @@ void Character::Attack(Character& target)
 void Character::OnDeath()
 {
 	if (isDead) return;
+	isTalking = false;
 	isDead = true;
-	// Define in children classes
 }

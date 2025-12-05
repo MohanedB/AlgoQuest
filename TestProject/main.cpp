@@ -33,6 +33,11 @@ bool ParseCommand(const std::string& line, Action& outAction) {
 		outAction = CreateAttack();
 		return true;
 	}
+	else if (cmd == "talk")
+	{
+		outAction = CreateTalk();
+		return true;
+	}
 	// TODO: Ajouter les else if pour attack, get, use ici (voir coequipiers)
 
 	return false;
@@ -70,7 +75,7 @@ int main() {
 	float RandomYE2 = distE2(genE2);
 	Character enemy2;
 	enemy2.Initialize(30.f, RandomXE2, RandomYE2, sf::Color::Red, 35.0f, 7.0f);
-	
+
 	// Ennemy 3
 	std::random_device rdE3;
 	std::mt19937 genE3(rdE3());
@@ -79,9 +84,7 @@ int main() {
 	float RandomYE3 = distE3(genE3);
 	Character enemy3;
 	enemy3.Initialize(50.f, RandomXE3, RandomYE3, sf::Color::Red, 50.0f, 15.0f);
-	
 
-	int numberOfEnemies = 3;
 	Character* enemies[3] = { &enemy1, &enemy2, &enemy3 };
 
 	// 3. SPAWN NPC
@@ -288,7 +291,7 @@ int main() {
 				if (!inCombat)
 				{
 					// choose first enemy in range
-					for (size_t i = 0; i < numberOfEnemies; i++)
+					for (size_t i = 0; i < 3; i++)
 					{
 						if (enemies[i]->IsDead() || enemies[i] == nullptr)
 							continue;
@@ -395,7 +398,47 @@ int main() {
 			//Talk action
 			else if (currentAction.type == ActionType::Talk)
 			{
+				static Character* talkTarget = nullptr;
+				static bool inConversation = false;
+				
+				if (!inConversation)
+				{
+					for (size_t i = 0; i < 4; i++)
+					{
+						if (talkables[i]->IsDead() || talkables[i] == nullptr)
+							continue;
 
+						float distToTalkable = sf::Vector2f(player.GetPosition() - talkables[i]->GetPosition()).length();
+						if (distToTalkable <= 50.0f)
+						{
+							talkTarget = talkables[i];
+							inConversation = true;
+							talkTarget->isTalking = true;
+							std::cout << "They say: " << talkTarget->dialogueDisplayText.getString().toAnsiString() << "\n";
+							break;
+						}
+					}
+				}
+
+				if (talkTarget == nullptr)
+				{
+					std::cout << "There's no one to talk to nearby.\n";
+					isBusy = false;
+				}
+
+				if (inConversation)
+				{
+					static float talkDuration = 5.0f; // 5 seconds talking 
+					talkDuration -= deltaTime;
+					if (talkDuration <= 0)
+					{
+						talkTarget->isTalking = false;
+						talkDuration = 2.0f;
+						inConversation = false;
+						talkTarget = nullptr;
+						isBusy = false;
+					}
+				}
 			}
 		}
 
@@ -422,26 +465,26 @@ int main() {
 		{
 			window.draw(enemy1.GetShape());
 			window.draw(enemy1.healthDisplayText);
+			if (enemy1.isTalking) window.draw(enemy1.dialogueDisplayText);
 		}
 		if (!enemy2.IsDead())
 		{
 			window.draw(enemy2.GetShape());
 			window.draw(enemy2.healthDisplayText);
+			if (enemy2.isTalking) window.draw(enemy2.dialogueDisplayText);
 		}
 		if (!enemy3.IsDead())
 		{
 			window.draw(enemy3.GetShape());
 			window.draw(enemy3.healthDisplayText);
+			if (enemy3.isTalking) window.draw(enemy3.dialogueDisplayText);
 		}
 		if (!player.IsDead())
 		{
 			window.draw(player.GetShape());
 			window.draw(player.healthDisplayText);
 		}
-		window.draw(npc.dialogueDisplayText);
-		window.draw(enemy1.dialogueDisplayText);
-		window.draw(enemy2.dialogueDisplayText);
-		window.draw(enemy3.dialogueDisplayText);
+		if (npc.isTalking) window.draw(npc.dialogueDisplayText);
 
 		window.draw(inputText);
 		window.draw(helpText);
