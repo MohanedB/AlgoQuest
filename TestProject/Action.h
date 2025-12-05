@@ -5,7 +5,7 @@
 #include "Inventory.h"
 
 // J'ai mis les types pour les boys, mais je code juste Move et Wait
-enum class ActionType { Move, Wait, Attack, Get, Use, Interact };
+enum class ActionType { Move, Wait, Attack, Get, Use, Interact, Talk };
 
 struct Action {
     ActionType type;
@@ -39,3 +39,4 @@ Action CreateUse(int itemId);
 
 
 Action CreateAttack();
+Action CreateTalk();

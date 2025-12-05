@@ -89,7 +89,7 @@ int main() {
 	Character enemyChar2;
 	enemyChar2.MaxHealth = 35.0f;
 	enemyChar2.HP = enemyChar2.MaxHealth;
-	enemyChar2.damage = 5.0f;
+	enemyChar2.damage = 7.0f;
 
 	// Ennemy 3
 	sf::RectangleShape enemy3(sf::Vector2f(50.f, 50.f));
@@ -104,7 +104,7 @@ int main() {
 	Character enemyChar3;
 	enemyChar3.MaxHealth = 50.0f;
 	enemyChar3.HP = enemyChar3.MaxHealth;
-	enemyChar3.damage = 7.0f;
+	enemyChar3.damage = 15.0f;
 
 	sf::Vector2f enemiesPos[3] = { enemy1.getPosition(), enemy2.getPosition(), enemy3.getPosition() };
 	Character* enemiesChar[3] = { &enemyChar1, &enemyChar2, &enemyChar3 };
@@ -173,13 +173,11 @@ int main() {
 	helpText.setFillColor(sf::Color(150, 150, 150));
 	helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]");
 
-	// PlayerHealth
-	sf::Text playerHealthDisplay(font, "", 16);
-	playerHealthDisplay.setPosition({ 10.f, 100.f });
-	playerHealthDisplay.setFillColor(sf::Color(0, 255, 0));
-	std::ostringstream ssHP;
-	ssHP << std::fixed << std::setprecision(0) << playerChar.HP; // float to int
-	playerHealthDisplay.setString("HP: " + ssHP.str());
+	// Player and Enemies Health Display
+	playerChar.InitializeHealthDisplay(font, 16, 10.f, 100.f, sf::Color(0, 255, 0));
+	enemyChar1.InitializeHealthDisplay(font, 16, enemy1.getPosition().x - 25.f, enemy1.getPosition().y - 35.f, sf::Color(255, 0, 0));
+	enemyChar2.InitializeHealthDisplay(font, 16, enemy2.getPosition().x - 25.f, enemy2.getPosition().y - 35.f, sf::Color(255, 0, 0));
+	enemyChar3.InitializeHealthDisplay(font, 16, enemy3.getPosition().x - 25.f, enemy3.getPosition().y - 45.f, sf::Color(255, 0, 0));
 
 	// File d'attente (HUD)
 	sf::Text queueDisplay(font, "FILE:", 18);
@@ -330,6 +328,7 @@ int main() {
 
 							// attack
 							playerChar.Attack(*targetEnemy);
+							targetEnemy->UpdateHealthDisplay();
 							std::cout << "Attacking enemy! (Enemy HP remaining: " << targetEnemy->HP << ")\n";
 
 							// check if dead
@@ -369,10 +368,9 @@ int main() {
 
 							// Get attacked
 							targetEnemy->Attack(playerChar);
+							
 							// Update HP HUD
-							ssHP.str(""); // clear
-							ssHP << std::fixed << std::setprecision(0) << playerChar.HP; // float to int
-							playerHealthDisplay.setString("HP: " + ssHP.str());
+							playerChar.UpdateHealthDisplay();
 							std::cout << "Enemy is attacking! (Player HP remaining: " << playerChar.HP << ")\n";
 
 							// check if dead
@@ -419,7 +417,10 @@ int main() {
 		window.draw(damageBuffRef);
 		window.draw(inputText);
 		window.draw(helpText);
-		window.draw(playerHealthDisplay);
+		window.draw(playerChar.playerHealthDisplay);
+		window.draw(enemyChar1.playerHealthDisplay);
+		window.draw(enemyChar2.playerHealthDisplay);
+		window.draw(enemyChar3.playerHealthDisplay);
 		window.draw(queueDisplay);
 		window.draw(inventoryShow);
 		window.display();

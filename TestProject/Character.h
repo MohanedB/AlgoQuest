@@ -1,15 +1,28 @@
 #pragma once
+#include <SFML/Graphics.hpp>
+#include <iomanip> // Add this include at the top of the file
+#include <sstream>
 
 
 class Character {
 public:
-	float MaxHealth = 100.0f;
-	float HP;
-	float damage = 5.0f;
 
-	void takeDamage(float damageTaken);
+    float MaxHealth = 100.0f;
+    float HP = 100.0f;
+    float damage = 5.0f;
 
-	void heal(float healAmount);
+    sf::Font font;
+    sf::Text playerHealthDisplay = sf::Text(font, "", 16);
+    std::ostringstream ssHP;
 
-	void Attack(Character& target);
+
+
+    void takeDamage(float damageTaken);
+
+    void heal(float healAmount);
+
+    void Attack(Character& target);
+
+    void InitializeHealthDisplay(sf::Font& font, int fontSize, float positionX, float positionY, sf::Color color);
+    void UpdateHealthDisplay();
 };

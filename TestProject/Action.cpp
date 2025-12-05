@@ -60,6 +60,14 @@ Action CreateUse(int itemId) {
 Action CreateAttack() {
     Action a;
     a.type = ActionType::Attack;
-    a.description = "STARTING COMBAT...";
+    a.description = "YOU PREPARE TO ATTACK...";
+    return a;
+}
+
+Action CreateTalk()
+{
+    Action a;
+    a.type = ActionType::Talk;
+    a.description = "YOU START TALKING...";
     return a;
 }
