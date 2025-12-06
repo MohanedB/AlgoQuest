@@ -47,6 +47,8 @@ bool ParseCommand(const std::string& line, Action& outAction) {
 float getLength(sf::Vector2f v) { return std::sqrt(v.x * v.x + v.y * v.y); }
 
 int main() {
+	bool isGameOver = false;
+
 	// Setup fenetre
 	sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "Moteur Action Queue");
 	window.setFramerateLimit(60);
@@ -65,7 +67,7 @@ int main() {
 	float RandomXE1 = distE1(genE1);
 	float RandomYE1 = distE1(genE1);
 	Character enemy1;
-	enemy1.Initialize(30.f, RandomXE1, RandomYE1, sf::Color::Red, 25.0f, 5.0f);
+	enemy1.Initialize(30.f, RandomXE1, RandomYE1, sf::Color::Red, 25.0f, 7.0f);
 
 	// Ennemy 2
 	std::random_device rdE2;
@@ -74,7 +76,7 @@ int main() {
 	float RandomXE2 = distE2(genE2);
 	float RandomYE2 = distE2(genE2);
 	Character enemy2;
-	enemy2.Initialize(30.f, RandomXE2, RandomYE2, sf::Color::Red, 35.0f, 7.0f);
+	enemy2.Initialize(30.f, RandomXE2, RandomYE2, sf::Color::Red, 35.0f, 10.0f);
 
 	// Ennemy 3
 	std::random_device rdE3;
@@ -161,6 +163,14 @@ int main() {
 	helpText.setFillColor(sf::Color(150, 150, 150));
 	helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]\n - attack (if near enemy)\n - talk (if near npc/enemy)");
 
+	// Game over text
+	sf::Text gameOverText(font, "", 50);
+	gameOverText.setPosition({ 100.f, 200.f });
+	gameOverText.setFillColor(sf::Color::Red);
+	gameOverText.setString("          GAME OVER\nClosing game in " + std::to_string(5) + " seconds");
+	gameOverText.setOutlineColor(sf::Color::Magenta);
+	gameOverText.setOutlineThickness(0.5f);
+
 	// Player and Enemies Health Display
 	player.InitializeHealthDisplay(font, 16, 10.f, 100.f, sf::Color(0, 255, 0));
 	enemy1.InitializeHealthDisplay(font, 16, enemy1.GetPosition().x - 25.f, enemy1.GetPosition().y + 15.f, sf::Color(255, 0, 0));
@@ -205,243 +215,247 @@ int main() {
 	while (window.isOpen()) {
 		float deltaTime = clock.restart().asSeconds();
 
-		// 6.1 - INPUTS
-		while (const std::optional<sf::Event> event = window.pollEvent()) {
-			if (event->is<sf::Event::Closed>()) window.close();
+		if (!isGameOver)
+		{
+			// 6.1 - INPUTS
+			while (const std::optional<sf::Event> event = window.pollEvent()) {
+				if (event->is<sf::Event::Closed>()) window.close();
 
-			// Typing system
-			if (const auto* textEvt = event->getIf<sf::Event::TextEntered>()) {
-				if (textEvt->unicode >= 32 && textEvt->unicode < 128) {
-					userBuffer += static_cast<char>(textEvt->unicode);
-				}
-			}
-			// Touches
-			if (const auto* keyEvt = event->getIf<sf::Event::KeyPressed>()) {
-				if (keyEvt->code == sf::Keyboard::Key::Backspace && !userBuffer.empty()) {
-					userBuffer.pop_back();
-				}
-				else if (keyEvt->code == sf::Keyboard::Key::Enter) {
-					Action act;
-					if (ParseCommand(userBuffer, act)) {
-						myQueue.add(act);
-						std::cout << "Added: " << act.description << "\n";
-					}
-					userBuffer.clear();
-				}
-			}
-		}
-
-		// 6.2 - MOTEUR (UPDATE)
-
-		// Si libre, on pop la prochaine action
-		if (!isBusy && !myQueue.isEmpty()) {
-			currentAction = myQueue.current();
-			myQueue.pop();
-			isBusy = true;
-		}
-
-		// Action Executions
-		if (isBusy) {
-			// Move action
-			if (currentAction.type == ActionType::Move) {
-				// Logique de deplacement vectoriel
-				sf::Vector2f dir = currentAction.targetPos - player.GetPosition();
-				float dist = getLength(dir);
-
-				if (dist < 5.f) {
-					player.GetShape().setPosition(currentAction.targetPos); // Arrive
-					isBusy = false;
-				}
-				else {
-					player.GetShape().move((dir / dist) * speed * deltaTime);
-				}
-			}
-
-			// Wait action
-			else if (currentAction.type == ActionType::Wait) {
-				currentAction.duration -= deltaTime;
-				if (currentAction.duration <= 0) isBusy = false;
-			}
-
-			//Get action
-			else if (currentAction.type == ActionType::Get)
-			{
-				//TODO: Check for collision with an item
-				//inv.add(itemHit);
-				//Destroy item ref
-
-				//Destroy temporaire, si une meilleure manière est trouvée, ceci va être supprimé
-				potionRef.setPosition({ 9999.0f, 9999.0f });
-			}
-
-			//Use action
-			else if (currentAction.type == ActionType::Use)
-			{
-				//TODO: Ajouter switch case qui check si item utilisé est heal, damage ou buff
-				player.heal(potion.itemPower);
-				//Use Damage Item
-				//Use Damage Buff
-			}
-
-			//Attack action
-			else if (currentAction.type == ActionType::Attack)
-			{
-				static Character* targetEnemy = nullptr;
-				static bool inCombat = false;
-				if (!inCombat)
-				{
-					// choose first enemy in range
-					for (size_t i = 0; i < 3; i++)
-					{
-						if (enemies[i]->IsDead() || enemies[i] == nullptr)
-							continue;
-
-						float distToEnemy = sf::Vector2f(player.GetPosition() - enemies[i]->GetPosition()).length();
-						if (distToEnemy <= 50.0f)
-						{
-							targetEnemy = enemies[i];
-							inCombat = true;
-							std::cout << "Combat Starts!\n";
-							break;
-						}
+				// Typing system
+				if (const auto* textEvt = event->getIf<sf::Event::TextEntered>()) {
+					if (textEvt->unicode >= 32 && textEvt->unicode < 128) {
+						userBuffer += static_cast<char>(textEvt->unicode);
 					}
 				}
-
-				if (targetEnemy == nullptr)  // no enemy was chosen, cancel attack
-				{
-					std::cout << "No enemy in range to attack.\n";
-					inCombat = false;
-					isBusy = false;
-				}
-
-				if (inCombat)
-				{
-					static int currentAttacker = 0; // 0 = player, 1 = enemy
-					static float attackCooldown = 1.0f; // 1 sec between attacks
-					switch (currentAttacker)
-					{
-					case 0:
-						// wait 1sec
-						attackCooldown -= deltaTime;
-						if (attackCooldown <= 0)
-						{
-							attackCooldown = 1.0f;
-							currentAttacker = 1;
-
-							// attack
-							player.Attack(*targetEnemy);
-							targetEnemy->UpdateHealthDisplay();
-							std::cout << "Attacking enemy! (Enemy HP remaining: " << targetEnemy->HP << ")\n";
-
-							// check if dead
-							if (targetEnemy->IsDead())
-							{
-								inCombat = false;
-								std::cout << "Enemy Defeated!!!";
-								// reset for next combat
-								currentAttacker = 0;
-								targetEnemy = nullptr;
-
-								// TODO Fred : spawn item
-
-								/**
-								*****************
-								*****************
-								*****************
-								*****************
-								*****************
-								*****************
-								**/
-
-								isBusy = false;
-								break;
-							}
+				// Touches
+				if (const auto* keyEvt = event->getIf<sf::Event::KeyPressed>()) {
+					if (keyEvt->code == sf::Keyboard::Key::Backspace && !userBuffer.empty()) {
+						userBuffer.pop_back();
+					}
+					else if (keyEvt->code == sf::Keyboard::Key::Enter) {
+						Action act;
+						if (ParseCommand(userBuffer, act)) {
+							myQueue.add(act);
+							std::cout << "Added: " << act.description << "\n";
 						}
-						break;
-					case 1:
-						// wait 1sec
-						attackCooldown -= deltaTime;
-						if (attackCooldown <= 0)
-						{
-							attackCooldown = 1.0f;
-							currentAttacker = 0;
-
-							// Get attacked
-							targetEnemy->Attack(player);
-
-							// Update HP HUD
-							player.UpdateHealthDisplay();
-							std::cout << "Enemy is attacking! (Player HP remaining: " << player.HP << ")\n";
-
-							// check if dead
-							if (player.IsDead())
-							{
-								inCombat = false;
-								std::cout << "GAME OVER";
-								// reset for next combat
-								currentAttacker = 0;
-								targetEnemy = nullptr;
-
-								// TODO GAME OVER
-
-								isBusy = false;
-								break;
-							}
-						}
-						break;
-					default:
-						break;
+						userBuffer.clear();
 					}
 				}
 			}
 
-			//Talk action
-			else if (currentAction.type == ActionType::Talk)
-			{
-				static Character* talkTarget = nullptr;
-				static bool inConversation = false;
-				
-				if (!inConversation)
-				{
-					for (size_t i = 0; i < 4; i++)
-					{
-						if (talkables[i]->IsDead() || talkables[i] == nullptr)
-							continue;
+			// 6.2 - MOTEUR (UPDATE)
 
-						float distToTalkable = sf::Vector2f(player.GetPosition() - talkables[i]->GetPosition()).length();
-						if (distToTalkable <= 50.0f)
-						{
-							talkTarget = talkables[i];
-							inConversation = true;
-							talkTarget->isTalking = true;
-							std::cout << "They say: " << talkTarget->dialogueDisplayText.getString().toAnsiString() << "\n";
-							break;
-						}
-					}
-				}
+			// Si libre, on pop la prochaine action
+			if (!isBusy && !myQueue.isEmpty()) {
+				currentAction = myQueue.current();
+				myQueue.pop();
+				isBusy = true;
+			}
 
-				if (talkTarget == nullptr)
-				{
-					std::cout << "There's no one to talk to nearby.\n";
-					isBusy = false;
-				}
+			// Action Executions
+			if (isBusy) {
+				// Move action
+				if (currentAction.type == ActionType::Move) {
+					// Logique de deplacement vectoriel
+					sf::Vector2f dir = currentAction.targetPos - player.GetPosition();
+					float dist = getLength(dir);
 
-				if (inConversation)
-				{
-					static float talkDuration = 5.0f; // 5 seconds talking 
-					talkDuration -= deltaTime;
-					if (talkDuration <= 0)
-					{
-						talkTarget->isTalking = false;
-						talkDuration = 2.0f;
-						inConversation = false;
-						talkTarget = nullptr;
+					if (dist < 5.f) {
+						player.GetShape().setPosition(currentAction.targetPos); // Arrive
 						isBusy = false;
 					}
+					else {
+						player.GetShape().move((dir / dist) * speed * deltaTime);
+					}
+				}
+
+				// Wait action
+				else if (currentAction.type == ActionType::Wait) {
+					currentAction.duration -= deltaTime;
+					if (currentAction.duration <= 0) isBusy = false;
+				}
+
+				//Get action
+				else if (currentAction.type == ActionType::Get)
+				{
+					//TODO: Check for collision with an item
+					//inv.add(itemHit);
+					//Destroy item ref
+
+					//Destroy temporaire, si une meilleure manière est trouvée, ceci va être supprimé
+					potionRef.setPosition({ 9999.0f, 9999.0f });
+				}
+
+				//Use action
+				else if (currentAction.type == ActionType::Use)
+				{
+					//TODO: Ajouter switch case qui check si item utilisé est heal, damage ou buff
+					player.heal(potion.itemPower);
+					//Use Damage Item
+					//Use Damage Buff
+				}
+
+				//Attack action
+				else if (currentAction.type == ActionType::Attack)
+				{
+					static Character* targetEnemy = nullptr;
+					static bool inCombat = false;
+					if (!inCombat)
+					{
+						// choose first enemy in range
+						for (size_t i = 0; i < 3; i++)
+						{
+							if (enemies[i]->IsDead() || enemies[i] == nullptr)
+								continue;
+
+							float distToEnemy = sf::Vector2f(player.GetPosition() - enemies[i]->GetPosition()).length();
+							if (distToEnemy <= 50.0f)
+							{
+								targetEnemy = enemies[i];
+								inCombat = true;
+								std::cout << "Combat Starts!\n";
+								break;
+							}
+						}
+					}
+
+					if (targetEnemy == nullptr)  // no enemy was chosen, cancel attack
+					{
+						std::cout << "No enemy in range to attack.\n";
+						inCombat = false;
+						isBusy = false;
+					}
+
+					if (inCombat)
+					{
+						static int currentAttacker = 0; // 0 = player, 1 = enemy
+						static float attackCooldown = 1.0f; // 1 sec between attacks
+						switch (currentAttacker)
+						{
+						case 0:
+							// wait 1sec
+							attackCooldown -= deltaTime;
+							if (attackCooldown <= 0)
+							{
+								attackCooldown = 1.0f;
+								currentAttacker = 1;
+
+								// attack
+								player.Attack(*targetEnemy);
+								targetEnemy->UpdateHealthDisplay();
+								std::cout << "Attacking enemy! (Enemy HP remaining: " << targetEnemy->HP << ")\n";
+
+								// check if dead
+								if (targetEnemy->IsDead())
+								{
+									inCombat = false;
+									std::cout << "Enemy Defeated!!!";
+									// reset for next combat
+									currentAttacker = 0;
+									targetEnemy = nullptr;
+
+									// TODO Fred : spawn item
+
+									/**
+									*****************
+									*****************
+									*****************
+									*****************
+									*****************
+									*****************
+									**/
+
+									isBusy = false;
+									break;
+								}
+							}
+							break;
+						case 1:
+							// wait 1sec
+							attackCooldown -= deltaTime;
+							if (attackCooldown <= 0)
+							{
+								attackCooldown = 1.0f;
+								currentAttacker = 0;
+
+								// Get attacked
+								targetEnemy->Attack(player);
+
+								// Update HP HUD
+								player.UpdateHealthDisplay();
+								std::cout << "Enemy is attacking! (Player HP remaining: " << player.HP << ")\n";
+
+								// check if dead
+								if (player.IsDead())
+								{
+									inCombat = false;
+									std::cout << "GAME OVER";
+									// reset
+									currentAttacker = 0;
+									targetEnemy = nullptr;
+
+									//Start game over screen
+									isGameOver = true;
+
+									isBusy = false;
+									break;
+								}
+							}
+							break;
+						default:
+							break;
+						}
+					}
+				}
+
+				//Talk action
+				else if (currentAction.type == ActionType::Talk)
+				{
+					static Character* talkTarget = nullptr;
+					static bool inConversation = false;
+
+					if (!inConversation)
+					{
+						for (size_t i = 0; i < 4; i++)
+						{
+							if (talkables[i]->IsDead() || talkables[i] == nullptr)
+								continue;
+
+							float distToTalkable = sf::Vector2f(player.GetPosition() - talkables[i]->GetPosition()).length();
+							if (distToTalkable <= 50.0f)
+							{
+								talkTarget = talkables[i];
+								inConversation = true;
+								talkTarget->isTalking = true;
+								std::cout << "They say: " << talkTarget->dialogueDisplayText.getString().toAnsiString() << "\n";
+								break;
+							}
+						}
+					}
+
+					if (talkTarget == nullptr)
+					{
+						std::cout << "There's no one to talk to nearby.\n";
+						isBusy = false;
+					}
+
+					if (inConversation)
+					{
+						static float talkDuration = 5.0f; // 5 seconds talking 
+						talkDuration -= deltaTime;
+						if (talkDuration <= 0)
+						{
+							talkTarget->isTalking = false;
+							talkDuration = 2.0f;
+							inConversation = false;
+							talkTarget = nullptr;
+							isBusy = false;
+						}
+					}
 				}
 			}
-		}
 
+		}
 		// 6.3 - UI DRAWING
 		inputText.setString("> " + userBuffer);
 
@@ -490,6 +504,24 @@ int main() {
 		window.draw(helpText);
 		window.draw(queueDisplay);
 		window.draw(inventoryShow);
+
+		if (isGameOver)
+		{
+			static float gameOverTimer = 5.0f; // 5 seconds timer before closing game
+			gameOverTimer -= deltaTime;
+			if (gameOverTimer <= 0)
+			{
+				window.close();
+			}
+
+			std::ostringstream ssGameOver;
+			ssGameOver.str("");
+			ssGameOver.clear();
+			ssGameOver << std::fixed << std::setprecision(0) << gameOverTimer; // float to int
+			gameOverText.setString("          GAME OVER\nClosing game in " + ssGameOver.str() + " seconds");
+			window.draw(gameOverText);
+		}
+
 		window.display();
 	}
 	return 0;
