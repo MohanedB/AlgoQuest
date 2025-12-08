@@ -11,12 +11,19 @@ void CharInventory::pop() {
 }
 
 Item CharInventory::getItemById(int itemId) const {
-	for (const auto& item : inv) {
-		if (item.itemId == itemId) {
-			return item;
-		}
-	}
+    for (const auto& item : inv) {
+        if (item.itemId == itemId) {
+            return item;
+        }
+    }
+
+    Item voidItem;
+	voidItem.itemId = -1;
+    voidItem.itemDesc = "Invalid";
+	voidItem.itemPower = 0;
+    return voidItem;
 }
+
 
 bool CharInventory::removeItemById(int itemId) {
 	for (auto it = inv.begin(); it != inv.end(); ++it) {

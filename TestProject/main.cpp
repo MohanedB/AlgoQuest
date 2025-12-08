@@ -317,15 +317,9 @@ int main() {
 				//Use action
 				else if (currentAction.type == ActionType::Use)
 				{
-					int lastUsedId = 0;
 					Item usedItem = inv.getItemById(currentAction.itemId);
-					
-					if (usedItem.itemDesc == "")
-					{
-						break;
-					}
 
-					if (currentAction.itemId != lastUsedId)
+					if (currentAction.itemId != -1 && usedItem.itemDesc != "Invalid")
 					{
 						switch (usedItem.type)
 						{
@@ -334,14 +328,12 @@ int main() {
 							player.UpdateHealthDisplay();
 							inv.removeItemById(usedItem.itemId);
 							std::cout << "Used item: " << usedItem.itemDesc << "\n";
-							lastUsedId = currentAction.itemId;
 							break;
 
 						case ItemType::Buff:
 							player.damage += usedItem.itemPower;
 							inv.removeItemById(usedItem.itemId);
 							std::cout << "Used item: " << usedItem.itemDesc << "\n";
-							lastUsedId = currentAction.itemId;
 							break;
 
 						default:
