@@ -23,9 +23,13 @@ void Character::InitializeHealthDisplay(sf::Font& font, int fontSize, float posi
 {
 	healthDisplayText.setFont(font);
 	healthDisplayText.setCharacterSize(fontSize);
-
 	healthDisplayText.setPosition({ positionX, positionY});
 	healthDisplayText.setFillColor(color);
+
+	positionDisplayText.setFont(font);
+	positionDisplayText.setCharacterSize(fontSize);
+	positionDisplayText.setPosition({ positionX, (positionY + 15.0f) });
+	positionDisplayText.setFillColor(color);
 
 	UpdateHealthDisplay();
 }
@@ -36,6 +40,7 @@ void Character::UpdateHealthDisplay()
 	ssHP.clear();
 	ssHP << std::fixed << std::setprecision(0) << HP; // float to int
 	healthDisplayText.setString("HP: " + ssHP.str());
+	positionDisplayText.setString("Position: " + std::to_string(static_cast<int>(shape.getPosition().x)) + ", " + std::to_string(static_cast<int>(shape.getPosition().y)));
 }
 
 void Character::InitializeDialogueDisplay(sf::String dialogue, sf::Font& font, int fontSize, float positionX, float positionY, sf::Color color)

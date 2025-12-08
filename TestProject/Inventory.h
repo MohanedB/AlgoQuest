@@ -2,7 +2,7 @@
 #include <string>
 #include <deque>
 
-enum class ItemType { Health, Damage, Buff };
+enum class ItemType { Health, Buff };
 
 struct Item {
     ItemType type;
@@ -15,7 +15,8 @@ class CharInventory {
 public:
     void add(const Item& item);
     void pop();
-    void removeItemById(int itemId);
+	Item getItemById(int itemId) const;
+    bool removeItemById(int itemId);
     bool isEmpty() const;
 
     const std::deque<Item>& getAllItems() const;

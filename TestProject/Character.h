@@ -33,6 +33,7 @@ public:
     void Attack(Character& target);
 
     sf::Text healthDisplayText = sf::Text(font, "", 16);
+    sf::Text positionDisplayText = sf::Text(font, "", 16);
     void InitializeHealthDisplay(sf::Font& font, int fontSize, float positionX, float positionY, sf::Color color);
     void UpdateHealthDisplay();
 

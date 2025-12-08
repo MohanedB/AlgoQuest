@@ -43,16 +43,17 @@ Action CreateWait(float sec) {
 }
 
 //Actions pour Items
-Action CreateGet(int itemId) {
+Action CreateGet() {
     Action a;
     a.type = ActionType::Get;
-    a.description = "GOT ITEM -> ( Id: " + std::to_string((int)itemId) + ")";
+    a.description = "SEARCHING FOR AN ITEM TO GRAB";
 	return a;
 }
 
 Action CreateUse(int itemId) {
 	Action a;
 	a.type = ActionType::Use;
+	a.itemId = itemId;
     a.description = "USED ITEM -> ( Id: " + std::to_string((int)itemId) + ")";
 	return a;
 }

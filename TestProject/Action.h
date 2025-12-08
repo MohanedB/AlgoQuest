@@ -11,6 +11,7 @@ struct Action {
     ActionType type;
     std::string description;    // Texte pour l'UI
     sf::Vector2f targetPos;     // Sert juste pour le Move
+	int itemId;               // Sert pour Get et Use
     float duration;             // Sert pour le Wait
     // TODO: Ajouter int targetId pour l'attaque (voir avec coequipier)
 };
@@ -34,7 +35,7 @@ Action CreateMove(float x, float y);
 Action CreateWait(float sec);
 
 //Actions pour Items
-Action CreateGet(const Item& item);
+Action CreateGet();
 Action CreateUse(int itemId);
 
 

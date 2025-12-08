@@ -38,7 +38,20 @@ bool ParseCommand(const std::string& line, Action& outAction) {
 		outAction = CreateTalk();
 		return true;
 	}
-	// TODO: Ajouter les else if pour attack, get, use ici (voir coequipiers)
+	else if (cmd == "use")
+	{
+		int id;
+		if (ss >> id)
+		{
+			outAction = CreateUse(id);
+			return true;
+		}
+	}
+	else if (cmd == "get")
+	{
+		outAction = CreateGet();
+		return true;
+	}
 
 	return false;
 }
@@ -118,21 +131,6 @@ int main() {
 	float RandomYH = dist(gen);
 	potionRef.setPosition({ RandomXH , RandomYH });
 
-	Item fireball;
-	fireball.type = ItemType::Damage;
-	fireball.itemId = 194;
-	fireball.itemDesc = "Fireball Spell";
-	fireball.itemPower = 15.0f;
-
-	sf::CircleShape fireballRef(20.0f);
-	fireballRef.setFillColor(sf::Color(255, 128, 0, 255));
-	fireballRef.setOrigin({ 15.f, 15.f });
-	std::random_device rdD;
-	std::mt19937 genD(rdD());
-	float RandomXD = dist(genD);
-	float RandomYD = dist(genD);
-	fireballRef.setPosition({ RandomXD , RandomYD });
-
 	Item damageBuff;
 	damageBuff.type = ItemType::Buff;
 	damageBuff.itemId = 277;
@@ -147,6 +145,8 @@ int main() {
 	float RandomXB = dist(gen);
 	float RandomYB = dist(gen);
 	damageBuffRef.setPosition({ RandomXB , RandomYB });
+
+	sf::Shape* items[2] = { &potionRef, &damageBuffRef };
 
 	sf::Font font;
 	if (!font.openFromFile("arial.ttf")) return -1;
@@ -196,13 +196,8 @@ int main() {
 	inventoryShow.setString(inventoryText);
 	int idx = 1;
 
-	//TODO REMOVE AFTER GET IS DONE
-	inv.add(potion);
-	inv.add(fireball);
-	inv.add(damageBuff);
-
 	for (const auto& a : inv.getAllItems()) {
-		inventoryText += std::to_string(idx++) + ". " + " itemID: " + std::to_string(a.itemId) + " Name: " + a.itemDesc + "\n";
+		inventoryText += std::to_string(idx++) + ". " + " itemID: " + std::to_string(a.itemId) + " Name: " + a.itemDesc + " Item Power:" + std::to_string(a.itemPower) + "\n";
 	}
 
 	// 6. MAIN LOOP
@@ -278,21 +273,102 @@ int main() {
 				//Get action
 				else if (currentAction.type == ActionType::Get)
 				{
-					//TODO: Check for collision with an item
-					//inv.add(itemHit);
-					//Destroy item ref
+					static sf::Shape* grabbedItem = nullptr;
 
-					//Destroy temporaire, si une meilleure manière est trouvée, ceci va être supprimé
-					potionRef.setPosition({ 9999.0f, 9999.0f });
+					for (size_t i = 0; i < 2; i++)
+					{
+						if (items[i] == nullptr)
+						{
+							std::cout << "Empty List";
+							continue;
+						}
+
+						float distToItem = sf::Vector2f(player.GetPosition() - items[i]->getPosition()).length();
+
+						if (distToItem <= 50.0f)
+						{
+							std::cout << "Item found";
+							grabbedItem = items[i];
+							grabbedItem->getFillColor() == sf::Color::Green ? inv.add(potion) : inv.add(damageBuff);
+							grabbedItem->setPosition({ 9999.0f, 9999.0f });
+						}
+						else
+						{
+							std::cout << "Item not in range \n";
+						}
+					}
+
+					std::string inventoryText = "Inventaire: \n";
+					int idx = 1;
+
+					for (const auto& item : inv.getAllItems())
+					{
+						inventoryText += std::to_string(idx++) + ". "
+							+ "itemID: " + std::to_string(item.itemId)
+							+ " Name: " + item.itemDesc
+							+ " Item Power: " + std::to_string(item.itemPower)
+							+ "\n";
+					}
+
+					inventoryShow.setString(inventoryText);
+					isBusy = false;
 				}
 
 				//Use action
 				else if (currentAction.type == ActionType::Use)
 				{
-					//TODO: Ajouter switch case qui check si item utilisé est heal, damage ou buff
-					player.heal(potion.itemPower);
-					//Use Damage Item
-					//Use Damage Buff
+					int lastUsedId = 0;
+					Item usedItem = inv.getItemById(currentAction.itemId);
+					
+					if (usedItem.itemDesc == "")
+					{
+						break;
+					}
+
+					if (currentAction.itemId != lastUsedId)
+					{
+						switch (usedItem.type)
+						{
+						case ItemType::Health:
+							player.heal(usedItem.itemPower);
+							player.UpdateHealthDisplay();
+							inv.removeItemById(usedItem.itemId);
+							std::cout << "Used item: " << usedItem.itemDesc << "\n";
+							lastUsedId = currentAction.itemId;
+							break;
+
+						case ItemType::Buff:
+							player.damage += usedItem.itemPower;
+							inv.removeItemById(usedItem.itemId);
+							std::cout << "Used item: " << usedItem.itemDesc << "\n";
+							lastUsedId = currentAction.itemId;
+							break;
+
+						default:
+							break;
+						}
+					}
+
+					else
+					{
+						std::cout << "You just used this item, no cheating!";
+					}
+
+					std::string inventoryText = "Inventaire: \n";
+					int idx = 1;
+
+					for (const auto& item : inv.getAllItems())
+					{
+						inventoryText += std::to_string(idx++) + ". "
+							+ "itemID: " + std::to_string(item.itemId)
+							+ " Name: " + item.itemDesc
+							+ " Item Power: " + std::to_string(item.itemPower)
+							+ "\n";
+					}
+
+					inventoryShow.setString(inventoryText);
+
+					isBusy = false;
 				}
 
 				//Attack action
@@ -354,17 +430,45 @@ int main() {
 									currentAttacker = 0;
 									targetEnemy = nullptr;
 
-									// TODO Fred : spawn item
+									Item droppedItem;
+									std::random_device rdID;
+									std::mt19937 genID(rdID());
+									std::uniform_int_distribution<int> distID(1, 100);
+									droppedItem.itemId = distID(genID);
 
-									/**
-									*****************
-									*****************
-									*****************
-									*****************
-									*****************
-									*****************
-									**/
+									std::random_device rdType;
+									std::mt19937 genType(rdType());
+									std::uniform_int_distribution<int> distType(1, 2);
+									int RandomItemType = distType(genType);
 
+									switch(RandomItemType)
+									{
+									case(1):
+										droppedItem.type = ItemType::Health;
+										droppedItem.itemDesc = "Dropped Health Item";
+										break;
+
+									case(2):
+										droppedItem.type = ItemType::Buff;
+										droppedItem.itemDesc = "Dropped Buff";
+										break;
+									}
+
+									droppedItem.itemPower = 10.0f;
+									inv.add(droppedItem);
+									std::string inventoryText = "Inventaire: \n";
+									int idx = 1;
+
+									for (const auto& item : inv.getAllItems())
+									{
+										inventoryText += std::to_string(idx++) + ". "
+											+ "itemID: " + std::to_string(item.itemId)
+											+ " Name: " + item.itemDesc
+											+ " Item Power: " + std::to_string(item.itemPower)
+											+ "\n";
+									}
+
+									inventoryShow.setString(inventoryText);
 									isBusy = false;
 									break;
 								}
@@ -465,13 +569,10 @@ int main() {
 			qStr += std::to_string(idx++) + ". " + a.description + "\n";
 		}
 		if (isBusy) qStr += "\n[RUNNING]...\n";
-
 		queueDisplay.setString(qStr);
-		inventoryShow.setString(inventoryText);
 
 		window.clear(sf::Color::Black);
 		window.draw(potionRef);
-		window.draw(fireballRef);
 		window.draw(damageBuffRef);
 
 		window.draw(npc.GetShape());
@@ -479,18 +580,21 @@ int main() {
 		{
 			window.draw(enemy1.GetShape());
 			window.draw(enemy1.healthDisplayText);
+			window.draw(enemy1.positionDisplayText);
 			if (enemy1.isTalking) window.draw(enemy1.dialogueDisplayText);
 		}
 		if (!enemy2.IsDead())
 		{
 			window.draw(enemy2.GetShape());
 			window.draw(enemy2.healthDisplayText);
+			window.draw(enemy2.positionDisplayText);
 			if (enemy2.isTalking) window.draw(enemy2.dialogueDisplayText);
 		}
 		if (!enemy3.IsDead())
 		{
 			window.draw(enemy3.GetShape());
 			window.draw(enemy3.healthDisplayText);
+			window.draw(enemy3.positionDisplayText);
 			if (enemy3.isTalking) window.draw(enemy3.dialogueDisplayText);
 		}
 		if (!player.IsDead())
