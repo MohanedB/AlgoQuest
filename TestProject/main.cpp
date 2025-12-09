@@ -4,6 +4,7 @@
 #include <cmath>
 #include <optional>
 #include <random>
+#include <iomanip> // Pour setprecision
 #include "Action.h"
 #include "Inventory.h"
 #include "Character.h"
@@ -13,6 +14,9 @@ bool ParseCommand(const std::string& line, Action& outAction) {
 	std::stringstream ss(line);
 	std::string cmd;
 	ss >> cmd;
+
+	// Note: Je mets des {} vides pour clean les warnings d'initialisation
+	outAction = {};
 
 	if (cmd == "walk" || cmd == "move") {
 		float x, y;
@@ -115,7 +119,9 @@ int main() {
 
 	// 4. SETUP ITEMS AND IVENTORY
 	CharInventory inv;
-	Item potion;
+
+	// Utilisation de {} pour initialiser à zéro et éviter les warnings 'uninitialized'
+	Item potion{};
 	potion.type = ItemType::Health;
 	potion.itemId = 583;
 	potion.itemDesc = "Health Potion";
@@ -131,7 +137,7 @@ int main() {
 	float RandomYH = dist(gen);
 	potionRef.setPosition({ RandomXH , RandomYH });
 
-	Item damageBuff;
+	Item damageBuff{}; // Hop, zero-init
 	damageBuff.type = ItemType::Buff;
 	damageBuff.itemId = 277;
 	damageBuff.itemDesc = "Damage Buff";
@@ -149,6 +155,7 @@ int main() {
 	sf::Shape* items[2] = { &potionRef, &damageBuffRef };
 
 	sf::Font font;
+	// SFML 3: openFromFile obligatoire
 	if (!font.openFromFile("arial.ttf")) return -1;
 
 	// 5. SETUP INTERFACE
@@ -161,7 +168,7 @@ int main() {
 	sf::Text helpText(font, "", 16);
 	helpText.setPosition({ 10.f, 450.f });
 	helpText.setFillColor(sf::Color(150, 150, 150));
-	helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]\n - attack (if near enemy)\n - talk (if near npc/enemy)");
+	helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]\n - get (if near item)\n - attack (if near enemy)\n - talk (if near npc/enemy)");
 
 	// Game over text
 	sf::Text gameOverText(font, "", 50);
@@ -171,13 +178,23 @@ int main() {
 	gameOverText.setOutlineColor(sf::Color::Magenta);
 	gameOverText.setOutlineThickness(0.5f);
 
+	// On recycle ce text object pour afficher les coords des items
+	sf::Text itemPosText(font, "", 14);
+	itemPosText.setFillColor(sf::Color::White);
+	itemPosText.setOutlineColor(sf::Color::Black);
+	itemPosText.setOutlineThickness(1.0f);
+
 	// Player and Enemies Health Display
+	// InitializeHealthDisplay semble setup la font pour tout le perso (HP + Position)
 	player.InitializeHealthDisplay(font, 16, 10.f, 100.f, sf::Color(0, 255, 0));
 	enemy1.InitializeHealthDisplay(font, 16, enemy1.GetPosition().x - 25.f, enemy1.GetPosition().y + 15.f, sf::Color(255, 0, 0));
 	enemy2.InitializeHealthDisplay(font, 16, enemy2.GetPosition().x - 25.f, enemy2.GetPosition().y + 15.f, sf::Color(255, 0, 0));
 	enemy3.InitializeHealthDisplay(font, 16, enemy3.GetPosition().x - 25.f, enemy3.GetPosition().y + 25.f, sf::Color(255, 0, 0));
 
-	//NPC and Enemies Dialogue Display
+	// NEW: On init le display du NPC pour qu'il ait la font, meme si on s'en fout de ses HP
+	npc.InitializeHealthDisplay(font, 16, npc.GetPosition().x - 25.f, npc.GetPosition().y + 15.f, sf::Color::Blue);
+
+	// NPC and Enemies Dialogue Display
 	enemy1.InitializeDialogueDisplay("I'm gonna beat you up", font, 16, enemy1.GetPosition().x - 70.f, enemy1.GetPosition().y - 35.f, sf::Color(255, 255, 255));
 	enemy2.InitializeDialogueDisplay("Fight me coward!", font, 16, enemy2.GetPosition().x - 55.f, enemy2.GetPosition().y - 35.f, sf::Color(255, 255, 255));
 	enemy3.InitializeDialogueDisplay("You don't stand a chance punk", font, 16, enemy3.GetPosition().x - 90.f, enemy3.GetPosition().y - 45.f, sf::Color(255, 255, 255));
@@ -196,13 +213,20 @@ int main() {
 	inventoryShow.setString(inventoryText);
 	int idx = 1;
 
+	// NEW: Player Damage Display (sous l'inventaire)
+	sf::Text damageDisplay(font, "", 18);
+	damageDisplay.setPosition({ 15.f, 300.f }); // Position arbitraire a gauche
+	damageDisplay.setFillColor(sf::Color::Magenta);
+	damageDisplay.setOutlineColor(sf::Color::Black);
+	damageDisplay.setOutlineThickness(1.0f);
+
 	for (const auto& a : inv.getAllItems()) {
 		inventoryText += std::to_string(idx++) + ". " + " itemID: " + std::to_string(a.itemId) + " Name: " + a.itemDesc + " Item Power:" + std::to_string(a.itemPower) + "\n";
 	}
 
 	// 6. MAIN LOOP
 	ActionQueue myQueue;
-	Action currentAction;
+	Action currentAction{}; // init à zero
 	bool isBusy = false; // State: est-ce qu'on fait une action ou pas
 	std::string userBuffer;
 	sf::Clock clock;
@@ -212,7 +236,7 @@ int main() {
 
 		if (!isGameOver)
 		{
-			// 6.1 - INPUTS
+			// 6.1 - INPUTS (SFML 3 style)
 			while (const std::optional<sf::Event> event = window.pollEvent()) {
 				if (event->is<sf::Event::Closed>()) window.close();
 
@@ -228,7 +252,7 @@ int main() {
 						userBuffer.pop_back();
 					}
 					else if (keyEvt->code == sf::Keyboard::Key::Enter) {
-						Action act;
+						Action act{}; // init ici aussi
 						if (ParseCommand(userBuffer, act)) {
 							myQueue.add(act);
 							std::cout << "Added: " << act.description << "\n";
@@ -239,6 +263,9 @@ int main() {
 			}
 
 			// 6.2 - MOTEUR (UPDATE)
+
+			// Update Damage HUD (en temps reel pour voir les buffs)
+			damageDisplay.setString("Player Damage: " + std::to_string((int)player.damage));
 
 			// Si libre, on pop la prochaine action
 			if (!isBusy && !myQueue.isEmpty()) {
@@ -283,6 +310,7 @@ int main() {
 							continue;
 						}
 
+						// SFML 3: Vector2f a la fonction .length()
 						float distToItem = sf::Vector2f(player.GetPosition() - items[i]->getPosition()).length();
 
 						if (distToItem <= 50.0f)
@@ -290,6 +318,8 @@ int main() {
 							std::cout << "Item found";
 							grabbedItem = items[i];
 							grabbedItem->getFillColor() == sf::Color::Green ? inv.add(potion) : inv.add(damageBuff);
+
+							// On cache l'item loin
 							grabbedItem->setPosition({ 9999.0f, 9999.0f });
 						}
 						else
@@ -376,6 +406,7 @@ int main() {
 							if (enemies[i]->IsDead() || enemies[i] == nullptr)
 								continue;
 
+							// SFML 3 .length() encore
 							float distToEnemy = sf::Vector2f(player.GetPosition() - enemies[i]->GetPosition()).length();
 							if (distToEnemy <= 50.0f)
 							{
@@ -422,7 +453,7 @@ int main() {
 									currentAttacker = 0;
 									targetEnemy = nullptr;
 
-									Item droppedItem;
+									Item droppedItem{}; // Init
 									std::random_device rdID;
 									std::mt19937 genID(rdID());
 									std::uniform_int_distribution<int> distID(1, 100);
@@ -433,7 +464,7 @@ int main() {
 									std::uniform_int_distribution<int> distType(1, 2);
 									int RandomItemType = distType(genType);
 
-									switch(RandomItemType)
+									switch (RandomItemType)
 									{
 									case(1):
 										droppedItem.type = ItemType::Health;
@@ -564,10 +595,32 @@ int main() {
 		queueDisplay.setString(qStr);
 
 		window.clear(sf::Color::Black);
-		window.draw(potionRef);
-		window.draw(damageBuffRef);
 
+		// On dessine les items si ils ne sont pas "picked up" (loin en x)
+		for (sf::Shape* item : items)
+		{
+			if (item->getPosition().x < 2000.f)
+			{
+				window.draw(*item);
+
+				// Prepare Coordinate Text
+				std::stringstream ssPos;
+				ssPos << "(" << (int)item->getPosition().x << ", " << (int)item->getPosition().y << ")";
+
+				itemPosText.setString(ssPos.str());
+
+				// FIX SFML 3: setPosition({x, y}) obligatoire maintenant
+				itemPosText.setPosition({ item->getPosition().x - 20.f, item->getPosition().y + 20.f });
+
+				window.draw(itemPosText);
+			}
+		}
+
+		// DRAW NPC + Position
 		window.draw(npc.GetShape());
+		window.draw(npc.positionDisplayText);
+		if (npc.isTalking) window.draw(npc.dialogueDisplayText);
+
 		if (!enemy1.IsDead())
 		{
 			window.draw(enemy1.GetShape());
@@ -594,12 +647,12 @@ int main() {
 			window.draw(player.GetShape());
 			window.draw(player.healthDisplayText);
 		}
-		if (npc.isTalking) window.draw(npc.dialogueDisplayText);
 
 		window.draw(inputText);
 		window.draw(helpText);
 		window.draw(queueDisplay);
 		window.draw(inventoryShow);
+		window.draw(damageDisplay);
 
 		if (isGameOver)
 		{
@@ -613,7 +666,7 @@ int main() {
 			std::ostringstream ssGameOver;
 			ssGameOver.str("");
 			ssGameOver.clear();
-			ssGameOver << std::fixed << std::setprecision(0) << gameOverTimer; // float to int
+			ssGameOver << std::fixed << std::setprecision(0) << gameOverTimer; 
 			gameOverText.setString("          GAME OVER\nClosing game in " + ssGameOver.str() + " seconds");
 			window.draw(gameOverText);
 		}
