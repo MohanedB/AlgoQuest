@@ -1,6 +1,4 @@
 #include "Character.h"
-//#include <sstream>
-//#include <iomanip> // Add this include at the top of the file
 
 
 void Character::Initialize(float size, float positionX, float positionY, sf::Color color, float maxHealth, float damage)
@@ -27,9 +25,11 @@ void Character::InitializeHealthDisplay(sf::Font& font, int fontSize, float posi
 	healthDisplayText.setFillColor(color);
 
 	positionDisplayText.setFont(font);
-	positionDisplayText.setCharacterSize(fontSize);
+	positionDisplayText.setCharacterSize(14);
 	positionDisplayText.setPosition({ positionX, (positionY + 15.0f) });
-	positionDisplayText.setFillColor(color);
+	positionDisplayText.setFillColor(sf::Color::White);
+	positionDisplayText.setOutlineColor(sf::Color::Black);
+	positionDisplayText.setOutlineThickness(1.0f);
 
 	UpdateHealthDisplay();
 }
@@ -40,7 +40,7 @@ void Character::UpdateHealthDisplay()
 	ssHP.clear();
 	ssHP << std::fixed << std::setprecision(0) << HP; // float to int
 	healthDisplayText.setString("HP: " + ssHP.str());
-	positionDisplayText.setString("Position: " + std::to_string(static_cast<int>(shape.getPosition().x)) + ", " + std::to_string(static_cast<int>(shape.getPosition().y)));
+	positionDisplayText.setString("( " + std::to_string(static_cast<int>(shape.getPosition().x)) + ", " + std::to_string(static_cast<int>(shape.getPosition().y)) + " )");
 }
 
 void Character::InitializeDialogueDisplay(sf::String dialogue, sf::Font& font, int fontSize, float positionX, float positionY, sf::Color color)

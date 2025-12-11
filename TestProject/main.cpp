@@ -166,7 +166,7 @@ int main() {
 
 	// Cheat sheet
 	sf::Text helpText(font, "", 16);
-	helpText.setPosition({ 10.f, 450.f });
+	helpText.setPosition({ 10.f, 430.f });
 	helpText.setFillColor(sf::Color(150, 150, 150));
 	helpText.setString("COMMANDES:\n - walk [x] [y]\n - wait [secondes]\n - use [itemId]\n - get (if near item)\n - attack (if near enemy)\n - talk (if near npc/enemy)");
 
@@ -185,20 +185,25 @@ int main() {
 	itemPosText.setOutlineThickness(1.0f);
 
 	// Player and Enemies Health Display
-	// InitializeHealthDisplay semble setup la font pour tout le perso (HP + Position)
+	// InitializeHealthDisplay setup la font pour tout le perso (HP + Position)
 	player.InitializeHealthDisplay(font, 16, 10.f, 100.f, sf::Color(0, 255, 0));
 	enemy1.InitializeHealthDisplay(font, 16, enemy1.GetPosition().x - 25.f, enemy1.GetPosition().y + 15.f, sf::Color(255, 0, 0));
 	enemy2.InitializeHealthDisplay(font, 16, enemy2.GetPosition().x - 25.f, enemy2.GetPosition().y + 15.f, sf::Color(255, 0, 0));
 	enemy3.InitializeHealthDisplay(font, 16, enemy3.GetPosition().x - 25.f, enemy3.GetPosition().y + 25.f, sf::Color(255, 0, 0));
-
-	// NEW: On init le display du NPC pour qu'il ait la font, meme si on s'en fout de ses HP
-	npc.InitializeHealthDisplay(font, 16, npc.GetPosition().x - 25.f, npc.GetPosition().y + 15.f, sf::Color::Blue);
+	
+	// Player Damage Display (sous l'inventaire)
+	sf::Text damageDisplay(font, "", 16);
+	damageDisplay.setPosition({ 10.f, 120.f }); // Position arbitraire a gauche
+	damageDisplay.setFillColor(sf::Color::Magenta);
 
 	// NPC and Enemies Dialogue Display
 	enemy1.InitializeDialogueDisplay("I'm gonna beat you up", font, 16, enemy1.GetPosition().x - 70.f, enemy1.GetPosition().y - 35.f, sf::Color(255, 255, 255));
 	enemy2.InitializeDialogueDisplay("Fight me coward!", font, 16, enemy2.GetPosition().x - 55.f, enemy2.GetPosition().y - 35.f, sf::Color(255, 255, 255));
 	enemy3.InitializeDialogueDisplay("You don't stand a chance punk", font, 16, enemy3.GetPosition().x - 90.f, enemy3.GetPosition().y - 45.f, sf::Color(255, 255, 255));
 	npc.InitializeDialogueDisplay("Hello traveler!", font, 16, npc.GetPosition().x - 50.f, npc.GetPosition().y - 35.f, sf::Color(255, 255, 255));
+	
+	// NEW: On init le display du NPC pour qu'il ait la font, meme si on s'en fout de ses HP
+	npc.InitializeHealthDisplay(font, 14, npc.GetPosition().x - 25.f, npc.GetPosition().y + 15.f, sf::Color::White);
 
 	// File d'attente (HUD)
 	sf::Text queueDisplay(font, "FILE:", 18);
@@ -212,13 +217,6 @@ int main() {
 	inventoryShow.setFillColor(sf::Color(150, 150, 150));
 	inventoryShow.setString(inventoryText);
 	int idx = 1;
-
-	// NEW: Player Damage Display (sous l'inventaire)
-	sf::Text damageDisplay(font, "", 18);
-	damageDisplay.setPosition({ 15.f, 300.f }); // Position arbitraire a gauche
-	damageDisplay.setFillColor(sf::Color::Magenta);
-	damageDisplay.setOutlineColor(sf::Color::Black);
-	damageDisplay.setOutlineThickness(1.0f);
 
 	for (const auto& a : inv.getAllItems()) {
 		inventoryText += std::to_string(idx++) + ". " + " itemID: " + std::to_string(a.itemId) + " Name: " + a.itemDesc + " Item Power:" + std::to_string(a.itemPower) + "\n";
